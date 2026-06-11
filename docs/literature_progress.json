@@ -1,0 +1,359 @@
+{
+  "target": 1100,
+  "queries": [
+    {
+      "index": 1,
+      "query": "robot foundation model",
+      "pages": 3,
+      "added": 300,
+      "total": 312
+    },
+    {
+      "index": 2,
+      "query": "robotics foundation models",
+      "pages": 3,
+      "added": 0,
+      "total": 312
+    },
+    {
+      "index": 3,
+      "query": "vision language action model robot",
+      "pages": 3,
+      "added": 237,
+      "total": 549
+    },
+    {
+      "index": 4,
+      "query": "vision language action models robotics",
+      "pages": 3,
+      "added": 0,
+      "total": 549
+    },
+    {
+      "index": 5,
+      "query": "large vision language model robotics manipulation",
+      "pages": 3,
+      "added": 156,
+      "total": 705
+    },
+    {
+      "index": 6,
+      "query": "language conditioned robot manipulation",
+      "pages": 3,
+      "added": 169,
+      "total": 874
+    },
+    {
+      "index": 7,
+      "query": "language conditioned robot policy",
+      "pages": 3,
+      "added": 127,
+      "total": 1001
+    },
+    {
+      "index": 8,
+      "query": "robotics transformer real world control",
+      "pages": 2,
+      "added": 146,
+      "total": 1147
+    },
+    {
+      "index": 9,
+      "query": "RT-1 robotics transformer",
+      "pages": 1,
+      "added": 65,
+      "total": 1212
+    },
+    {
+      "index": 10,
+      "query": "RT-2 vision language action",
+      "pages": 1,
+      "added": 67,
+      "total": 1279
+    },
+    {
+      "index": 11,
+      "query": "Open X-Embodiment robot learning",
+      "pages": 1,
+      "added": 49,
+      "total": 1328
+    },
+    {
+      "index": 12,
+      "query": "OpenVLA robot policy",
+      "pages": 1,
+      "added": 75,
+      "total": 1403
+    },
+    {
+      "index": 13,
+      "query": "Octo robot foundation model",
+      "pages": 1,
+      "added": 60,
+      "total": 1463
+    },
+    {
+      "index": 14,
+      "query": "RoboCat robot learning",
+      "pages": 1,
+      "added": 82,
+      "total": 1545
+    },
+    {
+      "index": 15,
+      "query": "RoboFlamingo robot manipulation",
+      "pages": 1,
+      "added": 53,
+      "total": 1598
+    },
+    {
+      "index": 16,
+      "query": "PaLM-E embodied multimodal language model",
+      "pages": 1,
+      "added": 69,
+      "total": 1667
+    },
+    {
+      "index": 17,
+      "query": "SayCan language model robot",
+      "pages": 1,
+      "added": 62,
+      "total": 1729
+    },
+    {
+      "index": 18,
+      "query": "VIMA multimodal robot manipulation",
+      "pages": 1,
+      "added": 47,
+      "total": 1776
+    },
+    {
+      "index": 19,
+      "query": "diffusion policy robot manipulation",
+      "pages": 1,
+      "added": 63,
+      "total": 1839
+    },
+    {
+      "index": 20,
+      "query": "action diffusion robot policy",
+      "pages": 1,
+      "added": 42,
+      "total": 1881
+    },
+    {
+      "index": 21,
+      "query": "action chunking transformer robot",
+      "pages": 1,
+      "added": 67,
+      "total": 1948
+    },
+    {
+      "index": 22,
+      "query": "imitation learning robot manipulation continuous action",
+      "pages": 1,
+      "added": 43,
+      "total": 1991
+    },
+    {
+      "index": 23,
+      "query": "behavior cloning robot manipulation action representation",
+      "pages": 1,
+      "added": 50,
+      "total": 2041
+    },
+    {
+      "index": 24,
+      "query": "discrete action representation robot learning",
+      "pages": 1,
+      "added": 50,
+      "total": 2091
+    },
+    {
+      "index": 25,
+      "query": "action tokenization robotics",
+      "pages": 1,
+      "added": 46,
+      "total": 2137
+    },
+    {
+      "index": 26,
+      "query": "latent action model robotics",
+      "pages": 1,
+      "added": 31,
+      "total": 2168
+    },
+    {
+      "index": 27,
+      "query": "motor command tokenization robot",
+      "pages": 1,
+      "added": 66,
+      "total": 2234
+    },
+    {
+      "index": 28,
+      "query": "robot action abstraction language grounding",
+      "pages": 1,
+      "added": 44,
+      "total": 2278
+    },
+    {
+      "index": 29,
+      "query": "semantic action grounding robotics",
+      "pages": 1,
+      "added": 46,
+      "total": 2324
+    },
+    {
+      "index": 30,
+      "query": "affordance model robot manipulation language",
+      "pages": 1,
+      "added": 14,
+      "total": 2338
+    },
+    {
+      "index": 31,
+      "query": "robot world model action planning",
+      "pages": 1,
+      "added": 27,
+      "total": 2365
+    },
+    {
+      "index": 32,
+      "query": "embodied AI world model action",
+      "pages": 1,
+      "added": 73,
+      "total": 2438
+    },
+    {
+      "index": 33,
+      "query": "sim-to-real robot policy action representation",
+      "pages": 1,
+      "added": 41,
+      "total": 2479
+    },
+    {
+      "index": 34,
+      "query": "tactile robot manipulation foundation model",
+      "pages": 1,
+      "added": 47,
+      "total": 2526
+    },
+    {
+      "index": 35,
+      "query": "3D perception robot foundation model",
+      "pages": 1,
+      "added": 16,
+      "total": 2542
+    },
+    {
+      "index": 36,
+      "query": "multimodal robot foundation model",
+      "pages": 1,
+      "added": 18,
+      "total": 2560
+    },
+    {
+      "index": 37,
+      "query": "robot policy transformer manipulation",
+      "pages": 1,
+      "added": 21,
+      "total": 2581
+    },
+    {
+      "index": 38,
+      "query": "generalist robot policy",
+      "pages": 1,
+      "added": 50,
+      "total": 2631
+    },
+    {
+      "index": 39,
+      "query": "robot learning from demonstration action space",
+      "pages": 1,
+      "added": 28,
+      "total": 2659
+    },
+    {
+      "index": 40,
+      "query": "continuous control representation learning robot",
+      "pages": 1,
+      "added": 19,
+      "total": 2678
+    },
+    {
+      "index": 41,
+      "query": "equivariant robot policy manipulation",
+      "pages": 1,
+      "added": 81,
+      "total": 2759
+    },
+    {
+      "index": 42,
+      "query": "closed-loop robot manipulation policy transformer",
+      "pages": 1,
+      "added": 21,
+      "total": 2780
+    },
+    {
+      "index": 43,
+      "query": "robot foundation model action space",
+      "pages": 1,
+      "added": 6,
+      "total": 2786
+    },
+    {
+      "index": 44,
+      "query": "robot action aliasing",
+      "pages": 1,
+      "added": 84,
+      "total": 2870
+    },
+    {
+      "index": 45,
+      "query": "control mode aliasing robot",
+      "pages": 1,
+      "added": 52,
+      "total": 2922
+    },
+    {
+      "index": 46,
+      "query": "language motor grounding robot",
+      "pages": 1,
+      "added": 26,
+      "total": 2948
+    },
+    {
+      "index": 47,
+      "query": "embodied agent action representation",
+      "pages": 1,
+      "added": 71,
+      "total": 3019
+    },
+    {
+      "index": 48,
+      "query": "robot manipulation action primitives learning",
+      "pages": 1,
+      "added": 29,
+      "total": 3048
+    },
+    {
+      "index": 49,
+      "query": "skill abstraction robot learning",
+      "pages": 1,
+      "added": 38,
+      "total": 3086
+    },
+    {
+      "index": 50,
+      "query": "robot policy action discretization",
+      "pages": 1,
+      "added": 20,
+      "total": 3106
+    }
+  ],
+  "errors": [],
+  "started_at": "2026-06-11 01:34:13",
+  "finished_at": "2026-06-11 01:36:10",
+  "total_rows": 3106
+}

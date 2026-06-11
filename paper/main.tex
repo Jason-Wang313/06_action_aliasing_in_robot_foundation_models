@@ -1,0 +1,318 @@
+\documentclass{article}
+
+\usepackage{iclr2026_conference,times}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{url}
+
+\title{Action Aliasing in Robot Foundation Models}
+
+\author{Anonymous Authors}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\Sspace}{\mathcal{S}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\diam}{\operatorname{diam}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Robot foundation models increasingly expose robot control through language-like
+or discretized action tokens.  This interface assumes that a token preserves the
+motor distinctions that matter physically.  We study the failure case where it
+does not.  We define an action token as a fiber of motor commands and call a
+token aliased when commands in the same fiber induce different next-state
+effects under the local dynamics.  A simple proposition shows that no decoder
+that observes only the token can recover distinctions whose effect diameter has
+already been collapsed.  We then introduce Effect-Separating Action Charts
+(ESAC): audit each token by the diameter of its observed transition effects and
+split only aliased token fibers into effect charts.  In a controlled
+contact-control simulator with redundant motor nullspaces, coarse action tokens
+drop from 0.70 to 0.10 success as alias strength grows, while ESAC remains in
+the 0.66--0.98 range when alias-resolving context is observable.  The evidence
+is deliberately mechanism-level and synthetic; the paper's claim is not that a
+new foundation model is state of the art, but that action-token interfaces need
+physical effect audits before their tokens can be treated as robot actions.
+\end{abstract}
+
+\section{Introduction}
+
+Robot foundation models (RFMs) and vision-language-action (VLA) policies have
+made it plausible to treat robot control as another sequence modeling problem:
+images, language, and sometimes proprioception enter a large model, and a robot
+action leaves it as a discrete token, action chunk, or continuous policy head
+\citep{brohan2023rt1,brohan2023rt2,openx2023rtx,kim2024openvla,octo2024,black2024pi0}.
+This is a powerful abstraction.  It is also a physically dangerous one.
+Language-like action tokens do not inherit the identity conditions of motor
+commands merely because they are useful for prediction.
+
+This paper asks a narrow question: when does an action token hide multiple
+physically different commands?  We call this \emph{action aliasing}.  The issue
+is not that a policy is uncertain, undertrained, or missing a larger backbone.
+The issue is representational: after a many-to-one action map has collapsed two
+commands into one token, a downstream decoder can only choose one effect for the
+whole fiber.  If contact, calibration, embodiment, or force mode makes the
+commands diverge physically, token accuracy can look high while control is
+non-identifiable.
+
+Our contribution is intentionally small but sharp.
+\begin{enumerate}[leftmargin=1.4em]
+    \item We define token-fiber aliasing using a task-relevant next-state effect
+    metric, rather than raw action distance or language similarity.
+    \item We prove a lower bound: the worst-case one-step effect error of any
+    token-only decoder is at least half the effect diameter of the token fiber.
+    \item We introduce Effect-Separating Action Charts (ESAC), which splits
+    aliased token fibers by observed transition effects and trains a chart
+    predictor for decoding.
+    \item We provide runnable evidence in a controlled embodied-control
+    simulator and release the literature matrix, synthesis docs, and scripts.
+\end{enumerate}
+
+We do not claim that all RFMs suffer this failure, that clustering is new by
+itself, or that ESAC is validated on real robots.  The claim is conditional:
+when a token fiber has large physical effect diameter, token-level success
+metrics are insufficient, and effect-separating repair changes the central
+mechanism from \emph{better token prediction} to \emph{preserving physical
+distinguishability}.
+
+\section{Related Work}
+
+\paragraph{Robot foundation models and VLA policies.}
+RT-1 and RT-2 showed that transformer policies can map large-scale robot data
+and web-scale vision-language knowledge into robot actions
+\citep{brohan2023rt1,brohan2023rt2}.  Open X-Embodiment and RT-X expanded this
+premise across embodiments \citep{openx2023rtx}; Octo and OpenVLA made
+generalist policies and VLA models more accessible
+\citep{octo2024,kim2024openvla}; pi0 uses a flow model for general robot
+control \citep{black2024pi0}.  These works make broad robot-data scaling and
+VLA action emission clearly prior art.  Our focus is the action interface
+itself: whether one emitted token denotes one physically coherent command.
+
+\paragraph{Action tokenization and action representations.}
+Recent work explicitly studies action tokens for VLAs, including FAST
+\citep{pertsch2025fast}, keypoint action tokens
+\citep{dipalo2024keypoint}, discrete policies for multi-task manipulation
+\citep{wu2025discrete}, and hybrid discrete-continuous action spaces for
+assembly \citep{zhang2022hybrid}.  Action chunking and ACT-style policies
+represent temporally extended commands \citep{zhao2023act}, while behavior
+transformers model multimodal actions \citep{shafiullah2022behavior}.  These
+methods improve action parameterization.  ESAC is different in where it places
+the criterion: two actions are distinct if their \emph{effects} differ under
+local dynamics, even when their token, language label, or raw action cluster is
+the same.
+
+\paragraph{Continuous visuomotor policies.}
+Diffusion and flow policies can model multimodal continuous action
+distributions without committing to a single discrete token
+\citep{chi2024diffusion,black2024pi0}.  They are important alternatives and
+upper baselines, not straw men.  Our theorem targets architectures or APIs that
+do use a many-to-one token interface; continuous heads can still inherit the
+problem if an upstream representation has already erased the relevant
+distinction.
+
+\paragraph{Language grounding, affordances, and contact.}
+VIMA, PaLM-E, SayCan, RoboCat, and related language-conditioned robot systems
+connect instructions or multimodal prompts to actions and skills
+\citep{jiang2022vima,driess2023palme,ahn2022saycan,bousmalis2023robocat}.
+Contact-rich robotics has long shown that small differences in force,
+compliance, and contact mode can change outcomes \citep{koval2015contact}.
+Action aliasing is where these two facts meet: a semantic action name can be too
+coarse for the physical distinctions that contact makes decisive.
+
+\section{Action-Fiber Aliasing}
+
+Let $s\in\Sspace$ be a robot/environment state and $a\in\A$ a motor command.
+Let $f(s,a)$ denote the one-step dynamics and let
+$\E_s(a)=\phi(f(s,a))-\phi(s)$ be a task-relevant physical effect, such as
+object displacement, contact wrench change, or a learned state-difference
+embedding.  The effect space has metric $d_\E$.
+
+An action-token interface is a map $q_s:\A\rightarrow\Z$.  The state dependence
+allows tokenizers that include controller mode or embodiment metadata, though
+many deployed interfaces are closer to $q(a)$.
+
+\begin{definition}[Token fiber]
+For state $s$ and token $z$, the action fiber is
+\[
+    F_s(z)=\{a\in\A: q_s(a)=z\}.
+\]
+\end{definition}
+
+\begin{definition}[Effect diameter and aliasing]
+The effect diameter of token $z$ at state $s$ is
+\[
+    \Delta_s(z)=\sup_{a,a'\in F_s(z)}
+        d_\E\bigl(\E_s(a),\E_s(a')\bigr).
+\]
+The token is $\epsilon$-aliased when $\Delta_s(z)>\epsilon$ for the
+task-relevant tolerance $\epsilon$.
+\end{definition}
+
+\begin{proposition}[Irreducible token-fiber error]
+Fix $s$ and $z$.  Any decoder that observes only $z$ and predicts a single
+effect $\hat e(z)$ has worst-case error
+\[
+    \sup_{a\in F_s(z)} d_\E(\E_s(a), \hat e(z))
+    \geq \frac{1}{2}\Delta_s(z).
+\]
+If two actions in the fiber have Euclidean effects separated by $\Delta_s(z)$
+and are equally likely, the minimum expected squared effect error is at least
+$\Delta_s(z)^2/4$.
+\end{proposition}
+
+\begin{proof}
+Choose $a,a'\in F_s(z)$ with effect distance arbitrarily close to
+$\Delta_s(z)$.  By the triangle inequality,
+$d_\E(\E_s(a),\E_s(a'))\leq d_\E(\E_s(a),\hat e)+d_\E(\hat e,\E_s(a'))$.
+At least one term is at least half their separation.  Taking the supremum gives
+the first claim.  In Euclidean space, the best single prediction for two
+equiprobable endpoints is their midpoint, yielding squared error
+$(\Delta_s(z)/2)^2$ for both endpoints.
+\end{proof}
+
+The proposition is elementary, but it changes what should be reported.  Token
+accuracy, language grounding accuracy, and decoder confidence do not certify
+that a token is physically coherent.  The missing quantity is $\Delta_s(z)$.
+
+\section{Effect-Separating Action Charts}
+
+ESAC is an audit-and-repair layer for tokenized robot policies.  Given
+transitions $(s_i,a_i,s'_i,z_i)$, compute effect vectors
+$e_i=\phi(s'_i)-\phi(s_i)$.  For each token $z$, estimate an empirical effect
+radius
+\[
+    \widehat R(z)=
+    \left(\frac{1}{|I_z|}\sum_{i\in I_z}
+    \|e_i-\bar e_z\|_2^2\right)^{1/2},
+    \quad I_z=\{i:z_i=z\}.
+\]
+Tokens with small $\widehat R(z)$ are left alone.  Tokens with large
+$\widehat R(z)$ are split into charts by clustering or covering the effects
+$\{e_i:i\in I_z\}$.  A chart predictor $h(o_i,z_i)$ is trained from
+observations $o_i$ to chart id, and a chart decoder emits either a prototype
+action or a local continuous decoder for $(z,k)$.
+
+The important design choice is the clustering space.  ESAC clusters within a
+token by \emph{transition effect}, not by raw motor command.  This matters for
+redundant robots: many motor vectors may be nullspace-equivalent, while nearby
+motor vectors can have different object effects under contact.  ESAC therefore
+uses the physical effect metric as the action semantics.
+
+\section{Controlled Evidence}
+
+\paragraph{Simulator.}
+We build a small contact-control environment with state-dependent linear local
+dynamics $e=B(s)a$.  Commands $a\in\mathbb{R}^4$ contain planar motion plus two
+hidden wrist/force channels.  The language-like token keeps only an eight-way
+cardinal motion label.  A binary contact mode and friction-dependent gain
+determine whether hidden channels create left or right object displacement.
+Thus two commands can share the same cardinal token while inducing different
+object effects.  We also add random motor nullspace variation: different
+low-level commands can produce the same object effect, so raw action clustering
+can waste charts on physically irrelevant differences.
+
+We compare: (i) one prototype per coarse token, (ii) raw action charts that
+split each token by motor-command clusters, (iii) ESAC with the alias-resolving
+mode/contact context hidden, (iv) ESAC with full observable context, (v) a
+continuous regressor as an upper baseline that bypasses token repair, and
+(vi) expert replay.  Success means one-step effect error below $0.36$.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.48\linewidth]{../figures/token_fiber_example.pdf}
+    \includegraphics[width=0.48\linewidth]{../figures/aliasing_sweep.pdf}
+    \caption{Left: one coarse token fiber contains two physically separated
+    effect modes; the coarse decoded mean lies between them.  Right: as alias
+    strength grows, the one-prototype token decoder fails.  ESAC remains useful
+    when the alias-resolving context is observable and fails substantially when
+    that context is hidden.}
+    \label{fig:sweep}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Synthetic contact-control results at alias strength $1.25$.}
+\label{tab:main}
+\begin{tabular}{lccc}
+\toprule
+Method & Success & Effect RMSE & Action RMSE \\
+\midrule
+Coarse token prototype & 0.148 & 0.653 & 1.040 \\
+Raw action charts & 0.631 & 0.380 & 0.966 \\
+ESAC, hidden alias context & 0.374 & 0.856 & 1.171 \\
+ESAC, full context & 0.743 & 0.317 & 0.868 \\
+Continuous regression upper & 1.000 & 0.119 & 0.846 \\
+Expert replay & 0.999 & 0.121 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Results.}
+Table~\ref{tab:main} shows the main operating point.  Coarse token decoding
+fails because the same token needs incompatible effects.  Raw action charts
+help, but ESAC is stronger because its charts ignore nullspace motor variation
+and split by what the object actually does.  The hidden-context ablation is
+crucial: ESAC is not magic.  If observations do not reveal which member of the
+fiber is needed, the chart predictor cannot identify it.  Figure~\ref{fig:sweep}
+shows the same pattern across alias strengths; within-token effect radius tracks
+coarse-token failure in the saved audit plots.
+
+\section{Limitations}
+
+This is not a real-robot result.  The evidence is a controlled simulator meant
+to isolate one mechanism.  The literature sweep used metadata and abstracts for
+scale, not full-paper reading for all 3,106 entries.  ESAC also requires
+transition effects during auditing or training, and it requires observations
+that contain the variables needed to pick the correct chart at test time.
+Continuous-action policies can avoid this exact token bottleneck, although they
+may still inherit aliasing from upstream abstractions.  Finally, the effect
+metric $\phi$ is task-dependent; a bad metric can hide the same problem ESAC is
+supposed to expose.
+
+\section{Conclusion}
+
+Robot action tokens should not be treated as physically atomic merely because a
+foundation model can predict them.  The right question is whether the token's
+fiber has small next-state effect diameter under the local dynamics.  If it
+does not, the token is non-identifiable for control.  ESAC is a first repair:
+split action tokens by physical effect charts, not by language names or raw
+motor proximity.  The result is a modest mechanism-level paper, but one with a
+clear demand for future RFMs: report and repair action-fiber aliasing.
+
+\bibliography{references}
+\bibliographystyle{iclr2026_conference}
+
+\appendix
+
+\section{Reproducibility Notes}
+
+The repository includes \texttt{scripts/build\_literature.py},
+\texttt{scripts/synthesize\_literature.py}, and
+\texttt{scripts/run\_experiments.py}.  The experiment command is:
+\begin{verbatim}
+python scripts/run_experiments.py
+\end{verbatim}
+It writes \texttt{results/sweep\_results.csv},
+\texttt{results/experiment\_summary.md}, and the figures included in the paper.
+
+\section{Novelty Audit Protocol}
+
+Before choosing ESAC, the run built a 3,106-row landscape matrix, a 300-paper
+serious skim, a 250-paper extraction table, and a 100-paper hostile prior-work
+set.  The nearest hostile areas were VLA models, action tokenization, action
+chunking, diffusion/flow policies, multimodal prompt policies, and
+cross-embodiment robot data.  These make scale, tokenization, and generic
+language-conditioned control non-novel.  The remaining boundary is the physical
+effect diameter of action-token fibers.
+
+\end{document}
