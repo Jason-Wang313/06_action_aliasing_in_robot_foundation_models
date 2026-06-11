@@ -1,7 +1,7 @@
 # Child Status
 
-- Stage: paper compiled and repo made runnable
-- Current task: create public GitHub repo and push
+- Stage: final audit written
+- Current task: commit and push final audit/status
 - Last updated: 2026-06-11
 - Commands run:
   - `apply_patch` added `plan.md`
@@ -33,6 +33,12 @@
   - read GitHub plugin publish guidance; this run needs repo create/push rather than PR
   - updated `.gitignore` to ignore downloaded/extracted template archive
   - added `README.md` and `requirements.txt`
+  - `gh auth status; exit 0`
+  - `git add -A; git commit -m "Create action aliasing paper artifacts"; exit 0`
+  - `gh repo create 06_action_aliasing_in_robot_foundation_models --public --source=. --remote=origin --push --description "..."; exit 0`
+  - `gh repo view Jason-Wang313/06_action_aliasing_in_robot_foundation_models --json nameWithOwner,url,visibility,defaultBranchRef; exit 0`
+  - checked `C:/Users/wangz/OneDrive/Desktop/06.pdf`; file was missing
+  - `apply_patch` added `docs/final_audit.md`
 - Findings:
   - `docs/related_work_matrix.csv` has 3106 entries.
   - `docs/deep_read_extractions.csv` has 250 entries.
@@ -40,6 +46,8 @@
   - At alias strength 1.25: coarse token success 0.148; raw action charts 0.631; ESAC full context 0.743; ESAC hidden-context ablation 0.374; continuous upper 1.000.
   - `paper/main.pdf` built successfully, 223625 bytes.
   - Exact final PDF exists at `C:/Users/wangz/Downloads/06.pdf`, 223625 bytes.
+  - Public GitHub repo exists: `https://github.com/Jason-Wang313/06_action_aliasing_in_robot_foundation_models`
+  - Desktop PDF status: pending orchestrator copy.
 - Failures:
   - Initial `Get-Content paper/iclr2026_template/iclr2026_conference.tex` path was wrong because zip contains inner `iclr2026/`; recovered by recursive listing.
   - First LaTeX pass failed on Markdown-style appendix path text with underscores; patched to `\texttt{...}`.
