@@ -16,7 +16,7 @@ Response: Only if the distinction remains in the representation available to the
 Response: Raw clustering is not the claim; ESAC clusters a token fiber by transition effects because the physical effect metric defines aliasing.
 
 ## Attack: The context variable in the simulation is too easy.
-Response: The ablation hiding that variable must fail, showing the method depends on observable alias-resolving information.
+Response: The v2 stress corrupts the alias-resolving mode/contact context at test time. ESAC falls from 74.2% clean success to 60.5% at 20% corruption, 44.3% at 40% corruption, and 37.7% when the alias context is hidden. The paper now treats reliable context as a required condition, not a solved problem.
 
 ## Attack: The method needs next-state effects, unavailable at test time.
 Response: It uses transition effects during auditing/training to construct charts; at test time it predicts chart ids from observations like other imitation policies.

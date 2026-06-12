@@ -222,6 +222,25 @@ def continuous_regression(train: Dataset, test: Dataset, feature_name: str = "fu
     return reg.predict(test_x)
 
 
+def with_corrupted_alias_context(data: Dataset, flip_rate: float, seed: int) -> Dataset:
+    """Flip the mode/contact features visible to the chart predictor at test time."""
+    rng = np.random.default_rng(seed)
+    full_context = data.full_context.copy()
+    flip_mask = rng.random(full_context.shape[0]) < flip_rate
+    # full_context columns 4 and 5 are the alias-resolving mode/contact signs.
+    full_context[flip_mask, 4] *= -1.0
+    full_context[flip_mask, 5] *= -1.0
+    return Dataset(
+        full_context=full_context,
+        hidden_context=data.hidden_context,
+        token=data.token,
+        action=data.action,
+        effect=data.effect,
+        target=data.target,
+        meta=data.meta,
+    )
+
+
 def alias_energy(data: Dataset) -> float:
     energies: List[float] = []
     weights: List[int] = []
@@ -262,6 +281,34 @@ def run_one(alias_strength: float, seed: int = 0) -> Dict[str, Dict[str, float]]
     return out
 
 
+def run_context_corruption(alias_strength: float = 1.25, seed: int = 606) -> List[Dict[str, float]]:
+    train = generate_dataset(4200, alias_strength, seed=3000 + seed)
+    test = generate_dataset(1800, alias_strength, seed=4000 + seed)
+    rows: List[Dict[str, float]] = []
+    for flip_rate in [0.0, 0.05, 0.10, 0.20, 0.40, 1.0]:
+        corrupted = with_corrupted_alias_context(test, flip_rate, seed=5000 + seed + int(flip_rate * 1000))
+        pred, audit = per_token_chart_policy(train, corrupted, feature_name="full", chart_space="effect", charts=3, seed=seed)
+        row = {
+            "condition": "flipped_full_context",
+            "alias_strength": alias_strength,
+            "context_flip_rate": flip_rate,
+        }
+        row.update(metrics(corrupted, pred))
+        row.update(audit)
+        rows.append(row)
+
+    pred_hidden, audit_hidden = per_token_chart_policy(train, test, feature_name="hidden", chart_space="effect", charts=3, seed=seed)
+    hidden_row = {
+        "condition": "hidden_alias_context",
+        "alias_strength": alias_strength,
+        "context_flip_rate": -1.0,
+    }
+    hidden_row.update(metrics(test, pred_hidden))
+    hidden_row.update(audit_hidden)
+    rows.append(hidden_row)
+    return rows
+
+
 def flatten_results(sweep: List[Tuple[float, Dict[str, Dict[str, float]]]]) -> List[Dict[str, float]]:
     rows: List[Dict[str, float]] = []
     for alias_strength, result in sweep:
@@ -293,7 +340,43 @@ def write_csv(path: str, rows: List[Dict[str, float]]) -> None:
             writer.writerow(row)
 
 
-def write_summary(rows: List[Dict[str, float]]) -> None:
+def write_context_csv(path: str, rows: List[Dict[str, float]]) -> None:
+    fields = [
+        "condition",
+        "alias_strength",
+        "context_flip_rate",
+        "success",
+        "effect_rmse",
+        "action_rmse",
+        "mean_chart_effect_radius",
+        "charts",
+    ]
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
+def write_context_table(rows: List[Dict[str, float]]) -> None:
+    by_rate = {float(r["context_flip_rate"]): r for r in rows}
+    wanted = [0.0, 0.10, 0.20, 0.40, -1.0]
+    labels = ["0\\%", "10\\%", "20\\%", "40\\%", "Hidden"]
+    values = [100.0 * float(by_rate[rate]["success"]) for rate in wanted]
+    lines = [
+        "\\begin{tabular}{lrrrrr}",
+        "\\toprule",
+        "Context condition & " + " & ".join(labels) + " \\\\",
+        "\\midrule",
+        "ESAC success & " + " & ".join(f"{value:.1f}" for value in values) + " \\\\",
+        "\\bottomrule",
+        "\\end{tabular}",
+    ]
+    with open(os.path.join(RESULTS, "context_stress_table.tex"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")
+
+
+def write_summary(rows: List[Dict[str, float]], context_rows: List[Dict[str, float]]) -> None:
     target = [r for r in rows if abs(float(r["alias_strength"]) - 1.25) < 1e-9]
     by_method = {r["method"]: r for r in target}
     methods = [
@@ -324,6 +407,17 @@ def write_summary(rows: List[Dict[str, float]]) -> None:
         )
     lines.append("")
     lines.append("Interpretation: coarse tokens fail as within-token effect diameter grows. ESAC succeeds only when the observation contains the variable that disambiguates the action fiber, which is exactly the intended limitation.")
+    lines.append("")
+    context_by_rate = {float(r["context_flip_rate"]): r for r in context_rows}
+    lines.append("Context corruption stress for ESAC at alias_strength=1.25:")
+    lines.append("")
+    lines.append("| Alias-context condition | Success | Effect RMSE |")
+    lines.append("|---|---:|---:|")
+    for label, rate in [("clean", 0.0), ("10% flipped", 0.10), ("20% flipped", 0.20), ("40% flipped", 0.40), ("hidden", -1.0)]:
+        r = context_by_rate[rate]
+        lines.append(f"| {label} | {float(r['success']):.3f} | {float(r['effect_rmse']):.3f} |")
+    lines.append("")
+    lines.append("Interpretation: ESAC is an effect-chart repair, not an oracle. It degrades as the alias-resolving observation becomes unreliable and approaches the hidden-context ablation when the needed context is unavailable.")
     with open(os.path.join(RESULTS, "experiment_summary.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -400,7 +494,10 @@ def main() -> int:
         sweep.append((strength, run_one(strength, seed=i)))
     rows = flatten_results(sweep)
     write_csv(os.path.join(RESULTS, "sweep_results.csv"), rows)
-    write_summary(rows)
+    context_rows = run_context_corruption()
+    write_context_csv(os.path.join(RESULTS, "context_stress_results.csv"), context_rows)
+    write_context_table(context_rows)
+    write_summary(rows, context_rows)
     plot_sweep(rows)
     plot_alias_energy(rows)
     plot_fiber_example()

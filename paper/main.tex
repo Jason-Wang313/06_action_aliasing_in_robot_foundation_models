@@ -26,6 +26,10 @@
 
 \maketitle
 
+\begin{center}
+{\small Submission-hardening version: v2 (2026-06-12).}
+\end{center}
+
 \begin{abstract}
 Robot foundation models increasingly expose robot control through language-like
 or discretized action tokens.  This interface assumes that a token preserves the
@@ -40,9 +44,13 @@ split only aliased token fibers into effect charts.  In a controlled
 contact-control simulator with redundant motor nullspaces, coarse action tokens
 drop from 0.70 to 0.10 success as alias strength grows, while ESAC remains in
 the 0.66--0.98 range when alias-resolving context is observable.  The evidence
-is deliberately mechanism-level and synthetic; the paper's claim is not that a
-new foundation model is state of the art, but that action-token interfaces need
-physical effect audits before their tokens can be treated as robot actions.
+is deliberately mechanism-level and synthetic.  A new context-corruption stress
+narrows the claim: at alias strength 1.25, ESAC success falls from 74.2\% with
+clean alias context to 60.5\% with 20\% corrupted context, 44.3\% with 40\%
+corruption, and 37.7\% when the alias context is hidden.  The paper's claim is
+not that a new foundation model is state of the art, but that action-token
+interfaces need physical effect audits before their tokens can be treated as
+robot actions.
 \end{abstract}
 
 \section{Introduction}
@@ -225,7 +233,9 @@ We compare: (i) one prototype per coarse token, (ii) raw action charts that
 split each token by motor-command clusters, (iii) ESAC with the alias-resolving
 mode/contact context hidden, (iv) ESAC with full observable context, (v) a
 continuous regressor as an upper baseline that bypasses token repair, and
-(vi) expert replay.  Success means one-step effect error below $0.36$.
+(vi) expert replay.  We also add a v2 context-corruption stress that flips the
+alias-resolving mode/contact features at test time.  Success means one-step
+effect error below $0.36$.
 
 \begin{figure}[t]
     \centering
@@ -267,6 +277,22 @@ fiber is needed, the chart predictor cannot identify it.  Figure~\ref{fig:sweep}
 shows the same pattern across alias strengths; within-token effect radius tracks
 coarse-token failure in the saved audit plots.
 
+\begin{table}[t]
+\centering
+\caption{ESAC context-corruption stress at alias strength $1.25$. The chart
+repair depends on reliable alias-resolving observations; it is not an oracle
+when the needed context is corrupted or hidden.}
+\label{tab:context}
+\input{../results/context_stress_table.tex}
+\end{table}
+
+Table~\ref{tab:context} is the v2 stress test.  ESAC starts at 74.2\% success
+with clean alias context, drops to 66.9\% with 10\% context flips, 60.5\% with
+20\% flips, and 44.3\% with 40\% flips.  When the alias context is entirely
+hidden, success is 37.7\%.  This narrows the supported claim: ESAC repairs
+token fibers only when the observation available to the chart predictor carries
+the physical variable that separates the effects.
+
 \section{Limitations}
 
 This is not a real-robot result.  The evidence is a controlled simulator meant
@@ -274,6 +300,8 @@ to isolate one mechanism.  The literature sweep used metadata and abstracts for
 scale, not full-paper reading for all 3,106 entries.  ESAC also requires
 transition effects during auditing or training, and it requires observations
 that contain the variables needed to pick the correct chart at test time.
+The v2 context-corruption stress makes this dependency concrete: moderate
+corruption degrades ESAC and hidden alias context nearly collapses the repair.
 Continuous-action policies can avoid this exact token bottleneck, although they
 may still inherit aliasing from upstream abstractions.  Finally, the effect
 metric $\phi$ is task-dependent; a bad metric can hide the same problem ESAC is

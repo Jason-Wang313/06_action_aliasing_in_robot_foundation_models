@@ -12,3 +12,15 @@ Synthetic contact-control environment at alias_strength=1.25. Success means one-
 | oracle_expert | 0.999 | 0.121 | 0.000 | Expert command replay upper bound. |
 
 Interpretation: coarse tokens fail as within-token effect diameter grows. ESAC succeeds only when the observation contains the variable that disambiguates the action fiber, which is exactly the intended limitation.
+
+Context corruption stress for ESAC at alias_strength=1.25:
+
+| Alias-context condition | Success | Effect RMSE |
+|---|---:|---:|
+| clean | 0.742 | 0.321 |
+| 10% flipped | 0.669 | 0.484 |
+| 20% flipped | 0.605 | 0.582 |
+| 40% flipped | 0.443 | 0.780 |
+| hidden | 0.377 | 0.837 |
+
+Interpretation: ESAC is an effect-chart repair, not an oracle. It degrades as the alias-resolving observation becomes unreliable and approaches the hidden-context ablation when the needed context is unavailable.

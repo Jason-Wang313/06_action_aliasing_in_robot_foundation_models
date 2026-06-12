@@ -60,3 +60,16 @@
   - Current limitation: literature extraction is metadata/abstract-based, not full-PDF reading for every row.
   - Final PDF target: `C:/Users/wangz/Downloads/06.pdf`
   - GitHub repo target: `06_action_aliasing_in_robot_foundation_models`
+
+Exit code: 0
+End time: 2026-06-11 02:05:37 +01:00
+PDF exists: True
+
+## Submission Hardening v2
+
+- Completed: 2026-06-12 21:10:52 +01:00
+- Terminal decision: workshop-only
+- Canonical PDF target: `C:/Users/wangz/Downloads/06.pdf` (225620 bytes)
+- Key experiment change: added ESAC context-corruption stress at alias strength 1.25.
+- Key result: ESAC success is 74.2% with clean alias context, 60.5% with 20% corrupted context, 44.3% with 40% corrupted context, and 37.7% when alias context is hidden.
+- Claim narrowed: ESAC requires reliable alias-resolving observations at test time and is not a real-robot or real-VLA result.

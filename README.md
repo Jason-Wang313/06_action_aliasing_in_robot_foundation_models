@@ -9,13 +9,12 @@ Robot foundation models that emit language-like or discretized action tokens can
 ## Main Artifacts
 
 - Paper source: `paper/main.tex`
-- Compiled paper: `paper/main.pdf`
 - Required final PDF copy: `C:/Users/wangz/Downloads/06.pdf`
 - Literature matrix: `docs/related_work_matrix.csv` with 3106 entries
 - Literature synthesis: `docs/literature_map.md`, `docs/hostile_prior_work.md`, `docs/novelty_boundary_map.md`, `docs/novelty_decision.md`
 - Claims/audit docs: `docs/claims.md`, `docs/reviewer_attacks.md`, `docs/final_audit.md`
 - Evidence script: `scripts/run_experiments.py`
-- Results: `results/sweep_results.csv`, `results/experiment_summary.md`
+- Results: `results/sweep_results.csv`, `results/context_stress_results.csv`, `results/experiment_summary.md`
 - Figures: `figures/aliasing_sweep.*`, `figures/alias_energy_failure.*`, `figures/token_fiber_example.*`
 
 ## Reproduce Experiments
@@ -47,3 +46,12 @@ python scripts/synthesize_literature.py
 ```
 
 The current run used metadata and available abstracts at scale; it did not manually read every full PDF.
+
+## Submission-Hardening v2
+
+The v2 pass adds a context-corruption stress for ESAC. At alias strength 1.25,
+ESAC reaches 74.2% success with clean alias context, 60.5% with 20% corrupted
+mode/contact context, 44.3% with 40% corruption, and 37.7% when the alias
+context is hidden. This narrows the supported claim: ESAC repairs action-token
+fibers only when the chart predictor can observe reliable alias-resolving
+variables.

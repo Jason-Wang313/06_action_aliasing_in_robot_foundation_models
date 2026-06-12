@@ -22,13 +22,13 @@
    The paper proves a simple token-fiber lower bound: any decoder that observes only a token has worst-case one-step effect error at least half the effect diameter of that token fiber. This is a formal impossibility claim for collapsed token interfaces, not a theorem about all robot policies.
 
 8. Strongest evidence:
-   Runnable synthetic contact-control evidence in `scripts/run_experiments.py`. At alias strength 1.25, coarse token decoding achieved 0.148 success, raw action charts 0.631, ESAC with full context 0.743, ESAC with hidden alias-resolving context 0.374, and a continuous regression upper baseline 1.000. The sweep and figures are saved in `results/` and `figures/`.
+   Runnable synthetic contact-control evidence in `scripts/run_experiments.py`. At alias strength 1.25, coarse token decoding achieved 0.148 success, raw action charts 0.631, ESAC with full context 0.743, ESAC with hidden alias-resolving context 0.374, and a continuous regression upper baseline 1.000. The v2 context-corruption stress shows ESAC drops from 74.2% clean success to 60.5% with 20% corrupted alias context, 44.3% with 40% corruption, and 37.7% when alias context is hidden. The sweep and figures are saved in `results/` and `figures/`.
 
 9. Biggest weaknesses:
-   Evidence is synthetic only; no real-robot or real-VLA intervention is shown. ESAC requires transition/effect observations during audit/training and observable alias-resolving context at test time. The effect metric is task-dependent. Continuous-action policies can avoid this exact token bottleneck if they bypass many-to-one action tokenization.
+   Evidence is synthetic only; no real-robot or real-VLA intervention is shown. ESAC requires transition/effect observations during audit/training and reliable observable alias-resolving context at test time. The v2 stress shows moderate context corruption degrades the repair. The effect metric is task-dependent. Continuous-action policies can avoid this exact token bottleneck if they bypass many-to-one action tokenization.
 
 10. Paper-readiness judgment:
-   Workshop. The mechanism, formal boundary, and runnable evidence are coherent, but a main-conference submission would need real robot/VLA audits, stronger baselines on existing action tokenizers, and manual full-paper verification of the closest hostile prior work.
+   Workshop-only for immediate submission; strong-revise for a main-conference target. The mechanism, formal boundary, and runnable evidence are coherent, and v2 narrows the context assumption. A main-conference submission would need real robot/VLA audits, stronger baselines on existing action tokenizers, and manual full-paper verification of the closest hostile prior work.
 
 11. Exact Downloads PDF path:
    `C:/Users/wangz/Downloads/06.pdf`
@@ -43,3 +43,16 @@ Additional build/publish status:
 - Official ICLR template source used at runtime: ICLR 2026 Author Guide pointing to `https://github.com/ICLR/Master-Template/raw/master/iclr2026.zip`.
 - `paper/main.pdf` compiled successfully with direct `pdflatex`, `bibtex`, `pdflatex`, `pdflatex`.
 - Public GitHub repo was created and initial commit pushed to `master`.
+
+## Orchestrator Desktop Copy
+
+Checked: 2026-06-11 02:05:41 +01:00
+Downloads PDF: C:/Users/wangz/Downloads/06.pdf
+Result: copy script exit 0 log C:\Users\wangz\robotics_60_paper_batch\logs\desktop_copy_06_20260611_020537.log
+
+## Submission-Hardening v2
+
+Checked: 2026-06-12 21:10:52 +01:00
+Terminal decision: workshop-only
+Key change: added ESAC context-corruption stress and narrowed the claim to reliable alias-resolving observations.
+Canonical PDF target: C:/Users/wangz/Downloads/06.pdf, 225620 bytes
