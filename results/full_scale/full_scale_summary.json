@@ -1,0 +1,121 @@
+{
+  "compact_metric_rows": 2526,
+  "context_flip_both_20": 0.5824999999999999,
+  "context_flip_both_40": 0.4404,
+  "context_hidden": 0.35629999999999995,
+  "csv_files": [
+    "alias_shift.csv",
+    "chart_ablation.csv",
+    "context_reliability.csv",
+    "data_scale.csv",
+    "effect_metric.csv",
+    "main_sweep.csv",
+    "negative_controls.csv",
+    "threshold_sensitivity.csv",
+    "token_granularity.csv"
+  ],
+  "evaluated_predictions_counting_rows": 2005200.0,
+  "figure_files": [
+    "alias_energy_diagnostic.png",
+    "alias_shift.png",
+    "chart_count_ablation.png",
+    "context_reliability.png",
+    "data_scale.png",
+    "effect_metric_sensitivity.png",
+    "main_alias_sweep.png",
+    "threshold_sensitivity.png",
+    "token_granularity.png"
+  ],
+  "main_b125_coarse_token": 0.14029999999999998,
+  "main_b125_continuous_upper": 0.998,
+  "main_b125_esac_full_context": 0.7282,
+  "main_b125_esac_hidden_context": 0.3556,
+  "main_b125_oracle_expert": 0.9995,
+  "main_b125_raw_action_charts": 0.6046,
+  "suite_compact_rows": {
+    "alias_shift.csv": 384,
+    "chart_ablation.csv": 192,
+    "context_reliability.csv": 250,
+    "data_scale.csv": 192,
+    "effect_metric.csv": 48,
+    "main_sweep.csv": 540,
+    "negative_controls.csv": 120,
+    "threshold_sensitivity.csv": 224,
+    "token_granularity.csv": 576
+  },
+  "suite_seed_counts": {
+    "alias_shift.csv": 8,
+    "chart_ablation.csv": 8,
+    "context_reliability.csv": 10,
+    "data_scale.csv": 8,
+    "effect_metric.csv": 8,
+    "main_sweep.csv": 10,
+    "negative_controls.csv": 8,
+    "threshold_sensitivity.csv": 8,
+    "token_granularity.csv": 8
+  },
+  "suite_test_rows": {
+    "alias_shift.csv": [
+      700
+    ],
+    "chart_ablation.csv": [
+      700
+    ],
+    "context_reliability.csv": [
+      1000
+    ],
+    "data_scale.csv": [
+      700
+    ],
+    "effect_metric.csv": [
+      700
+    ],
+    "main_sweep.csv": [
+      1000
+    ],
+    "negative_controls.csv": [
+      700
+    ],
+    "threshold_sensitivity.csv": [
+      700
+    ],
+    "token_granularity.csv": [
+      700
+    ]
+  },
+  "suite_train_rows": {
+    "alias_shift.csv": [
+      1600
+    ],
+    "chart_ablation.csv": [
+      1600
+    ],
+    "context_reliability.csv": [
+      2600
+    ],
+    "data_scale.csv": [
+      500,
+      1000,
+      2000,
+      4000
+    ],
+    "effect_metric.csv": [
+      1600
+    ],
+    "main_sweep.csv": [
+      2600
+    ],
+    "negative_controls.csv": [
+      1600
+    ],
+    "threshold_sensitivity.csv": [
+      1600
+    ],
+    "token_granularity.csv": [
+      1600
+    ]
+  },
+  "summary_command_seed_scale": 8,
+  "summary_command_test_rows": 700,
+  "summary_command_train_rows": 1600
+}

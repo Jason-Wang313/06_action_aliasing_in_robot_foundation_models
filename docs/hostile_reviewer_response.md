@@ -1,7 +1,9 @@
 # Hostile Reviewer Response
 
-The strongest hostile review is that ESAC wins only because the simulator gives it a clean, explicit context variable for choosing the right chart. The v2 stress test accepts the attack and measures the boundary. At alias strength 1.25, ESAC success is 74.2% with clean alias context, 60.5% with 20% corrupted context, 44.3% with 40% corrupted context, and 37.7% when the alias context is hidden.
+The strongest hostile review is that ESAC wins only when the simulator provides an observable alias-resolving variable. The final paper accepts this and makes the boundary central. Hidden alias context reaches only 0.356, and mode/contact corruption substantially degrades ESAC. The repair works when effect clusters are selectable from observation.
 
-This means the paper should not imply that ESAC recovers hidden action-fiber distinctions from nowhere. It repairs aliased token fibers only when observations retain the variables that separate physical effects. The mechanism remains useful as an audit and representation repair, but it is not a perception solution.
+The second hostile review is that continuous policies avoid the token bottleneck. The final paper agrees. Continuous regression reaches 0.998 at the main operating point and is treated as an upper comparator. The claim is not that ESAC beats continuous policies; the claim is that tokenized action interfaces need effect-diameter audits.
 
-The paper remains workshop-only: synthetic simulator, no real VLA intervention, no hardware, and no direct evaluation on existing tokenizers such as FAST or OpenVLA-style action outputs.
+The third hostile review is that this is just clustering. The final ablations answer that directly: random charts stay near coarse-token performance, raw action charts are weaker than effect charts, and random effect metrics collapse.
+
+The remaining weaknesses are still serious: no real robot, no real VLA tokenizer audit, synthetic context features, and task-dependent effect metrics. A fair review should evaluate the manuscript as a full-scale synthetic mechanism paper, not as a deployed robot foundation model.
